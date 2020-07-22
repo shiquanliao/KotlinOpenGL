@@ -45,11 +45,10 @@ public:
 
 private:
 
-    pthread_t pthread;
+    pthread_t mEglThread = -1;
     pthread_mutex_t pthread_mutex;
     pthread_cond_t pthread_cond;
     ANativeWindow *m_ANativeWindow;
-    int m_EglThread;
     bool isCreate;
     bool isChange;
     bool isExit;

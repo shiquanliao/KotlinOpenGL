@@ -10,8 +10,7 @@
 
 extern void *eglThreadImpl(void *context);
 
-EGLThread::EGLThread() : pthread(0), pthread_mutex{}, pthread_cond{},
-                         m_ANativeWindow(nullptr), m_EglThread(-1),
+EGLThread::EGLThread() : mEglThread(-1), pthread_mutex{}, pthread_cond{}, m_ANativeWindow(nullptr),
                          isCreate(false), isChange(false), isExit(false), isStart(false),
                          surfaceWidth(0), surfaceHeight(0), renderType(RENDER_MODULE_MANUAL) {
     pthread_mutex_init(&pthread_mutex, nullptr);
@@ -26,15 +25,15 @@ EGLThread::~EGLThread() {
 
 
 void EGLThread::onSurfaceCreate(EGLNativeWindowType window) {
-    if (m_EglThread == -1) {
+    if (mEglThread == -1) {
         isCreate = true;
         m_ANativeWindow = window;
-        pthread_create(&pthread, nullptr, eglThreadImpl, this);
+        pthread_create(&mEglThread, nullptr, eglThreadImpl, this);
     }
 }
 
 void EGLThread::onSurfaceChange(int width, int height) {
-    if (m_EglThread != -1) {
+    if (mEglThread != -1) {
         isChange = true;
         surfaceWidth = width;
         surfaceHeight = height;
@@ -85,7 +84,6 @@ void *eglThreadImpl(void *context) {
     while (!eglThread->isExit) {
         if (eglThread->isCreate) {
             eglThread->isCreate = false;
-            eglThread->isStart = true;
             eglThread->onCreate();
         }
 
@@ -99,7 +97,7 @@ void *eglThreadImpl(void *context) {
             eglThread->onDraw();
             egl->Draw();
             if (eglThread->renderType == RENDER_MODULE_AUTO) {
-                usleep(1000000 / 60);
+                usleep(1000000);
             } else {
                 pthread_mutex_lock(&eglThread->pthread_mutex);
                 pthread_cond_wait(&eglThread->pthread_cond, &eglThread->pthread_mutex);
