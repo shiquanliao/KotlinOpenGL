@@ -4,7 +4,7 @@
 
 #include "EGLThread.h"
 #include "XLog.h"
-#include "XEGL.h"
+#include "RenderManager.h"
 #include <unistd.h>
 
 
@@ -74,9 +74,9 @@ void *eglThreadImpl(void *context) {
         return 0;
     }
 
-    XEGL *egl = XEGL::Get();
+    RenderManager *renderManager = RenderManager::GetInstance();
 
-    if (!egl->Init(eglThread->m_ANativeWindow)) {
+    if (!renderManager->Init(eglThread->m_ANativeWindow)) {
         XLOGE("XEGL init error");
         return 0;
     }
@@ -95,7 +95,7 @@ void *eglThreadImpl(void *context) {
 
         if (eglThread->isStart) {
             eglThread->onDraw();
-            egl->Draw();
+            renderManager->Draw();
             if (eglThread->renderType == RENDER_MODULE_AUTO) {
                 usleep(1000000);
             } else {
@@ -106,8 +106,8 @@ void *eglThreadImpl(void *context) {
         }
     }
 
-    egl->Close();
-    egl = nullptr;
+    renderManager->Close();
+    renderManager = nullptr;
 
     return nullptr;
 }

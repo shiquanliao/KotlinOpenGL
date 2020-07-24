@@ -66,7 +66,7 @@ Java_com_example_kotlinopengl_JNIUtils_nativeSurfaceDestroyed(JNIEnv *env, jobje
         //等待线程结束
         pthread_join(reinterpret_cast<pthread_t>(eglThread), 0);
         delete (eglThread);
-        eglThread = NULL;
+        eglThread = nullptr;
     }
 }
 

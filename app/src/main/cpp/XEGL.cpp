@@ -39,8 +39,8 @@ public:
     }
 
     bool Init(void *win) override {
-        auto *pNativeWindow = static_cast<ANativeWindow *>(win);
         Close();
+        auto *pNativeWindow = static_cast<ANativeWindow *>(win);
         // 1. init EGL
         std::lock_guard<std::mutex> lockGuard(g_mutex);
         display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
