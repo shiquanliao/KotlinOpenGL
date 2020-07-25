@@ -6,29 +6,30 @@
 #include "RenderManager.h"
 #include "XLog.h"
 #include "XEGL.h"
+#include "XShader.h"
 
-class CRenderManger: public RenderManager{
+class CRenderManger : public RenderManager {
 private:
     std::mutex g_mutex;
-
+    XShader shader;
 public:
     bool Init(void *win) override {
         XEGL::Get()->Close();
-        std::lock_guard<std::mutex> lockGuard(g_mutex);
         // todo shader should be close here.
-        // ...
-        if(!win){
+        shader.Close();
+        std::lock_guard<std::mutex> lockGuard(g_mutex);
+        if (!win) {
             XLOGE("RenderManager init failed [win is null]");
             return false;
         }
 
-        if(!XEGL::Get()->Init(win)){
+        if (!XEGL::Get()->Init(win)) {
             XLOGE("RenderManger init failed [XEGL init Error]");
             return false;
         }
 
         // todo shader should be init here.
-        // ...
+        shader.Init();
 
         return true;
     }
@@ -37,17 +38,15 @@ public:
         std::lock_guard<std::mutex> lockGuard(g_mutex);
 
         // todo shader should be draw here
-        // ...
-
+        shader.Draw();
         XEGL::Get()->Draw();
-   }
+    }
 
     void Close() override {
         std::lock_guard<std::mutex> lockGuard(g_mutex);
 
         // todo shader should be close here
-        // ...
-
+        shader.Close();
         XEGL::Get()->Close();
 
         delete this;

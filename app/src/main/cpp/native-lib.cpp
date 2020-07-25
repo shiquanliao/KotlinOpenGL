@@ -2,7 +2,7 @@
 #include <string>
 #include "EGLThread.h"
 #include "XLog.h"
-#include "GLES2/gl2.h"
+#include "GLES3/gl3.h"
 #include "android/native_window.h"
 #include "android/native_window_jni.h"
 #include "pthread.h"
@@ -19,8 +19,8 @@ void callBackOnChange(int width, int height) {
 }
 
 void callBackOnDraw() {
-    glClearColor(0.0f, 0.3f, 0.3f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
+//    glClearColor(0.0f, 0.3f, 0.3f, 1.0f);
+//    glClear(GL_COLOR_BUFFER_BIT);
     XLOGE("callBackOnDraw");
 }
 

@@ -90,9 +90,19 @@ public:
         }
 
         XLOGI("eglMakeCurrent success!");
+
+        this->DrawTriangle();
+
         return true;
     }
+
+private:
+    void DrawTriangle(){
+
+    }
 };
+
+
 
 
 XEGL *XEGL::Get() {

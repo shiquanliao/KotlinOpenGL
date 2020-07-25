@@ -19,6 +19,7 @@ add_library( # Sets the name of the library.
         # Provides a relative path to your source file(s).
         native-lib.cpp
         EGLThread.cpp
+        XShader.cpp
         RenderManager.cpp
         XEGL.cpp)
 
@@ -42,7 +43,7 @@ find_library( # Sets the name of the path variable.
 target_link_libraries( # Specifies the target library.
         native-lib
         EGL
-        GLESv2
+        GLESv3
         OpenSLES
         android
         # Links the target library to the log library
