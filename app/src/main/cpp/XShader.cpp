@@ -19,7 +19,7 @@ const char *fragmentShaderSource = "#version 300 es\n"
                                    "precision mediump float;\n"
                                    "out vec4 fragmentColor;\n"
                                    "void main()\n"
-                                   "{\n"k
+                                   "{\n"
                                    "   fragmentColor = vec4(1.0f, 0.5f, 0.2f, 1.0f) ;\n"
                                    "}\n\0";
 
