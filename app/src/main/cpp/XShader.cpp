@@ -15,13 +15,21 @@ const char *vertexShaderSource = "#version 300 es\n"
                                  "{\n"
                                  "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
                                  "}\0";
-const char *fragmentShaderSource = "#version 300 es\n"
+const char *fragmentShader1Source = "#version 300 es\n"
                                    "precision mediump float;\n"
                                    "out vec4 fragmentColor;\n"
                                    "void main()\n"
                                    "{\n"
                                    "   fragmentColor = vec4(1.0f, 0.5f, 0.2f, 1.0f) ;\n"
                                    "}\n\0";
+
+const char *fragmentShader2Source = "#version 300 es\n"
+                                    "precision mediump float;\n"
+                                    "out vec4 fragmentColor;\n"
+                                    "void main()\n"
+                                    "{\n"
+                                    "   fragmentColor = vec4(1.0f, 1.0f, 0.0f, 1.0f) ;\n"
+                                    "}\n\0";
 
 
 bool XShader::Init() {
@@ -95,15 +103,18 @@ bool XShader::Init() {
     // -------------------------- Compiling a shader start --------------------
     // 4. like step1, get the xxxShader ID
     vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+    fragmentShaderOrange = glCreateShader(GL_FRAGMENT_SHADER);
+    fragmentShaderYellow = glCreateShader(GL_FRAGMENT_SHADER);
 
     // 5. attach the source code to the xxxShader
     glShaderSource(vertexShader, 1, &vertexShaderSource, nullptr);
-    glShaderSource(fragmentShader, 1, &fragmentShaderSource, nullptr);
+    glShaderSource(fragmentShaderOrange, 1, &fragmentShader1Source, nullptr);
+    glShaderSource(fragmentShaderYellow, 1, &fragmentShader2Source, nullptr);
 
     // 6. compile the vertexShader
     glCompileShader(vertexShader);
-    glCompileShader(fragmentShader);
+    glCompileShader(fragmentShaderOrange);
+    glCompileShader(fragmentShaderYellow);
 
     // check
     // Q: 'iv' at the end of glGetShaderiv() stand for?
@@ -117,10 +128,17 @@ bool XShader::Init() {
         return false;
     }
 
-    glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
+    glGetShaderiv(fragmentShaderOrange, GL_COMPILE_STATUS, &success);
     if (success == GL_FALSE) {
-        glGetShaderInfoLog(fragmentShader, sizeof(infoLog), nullptr, infoLog);
-        XLOGE("fragmentShader compile failed:[%s]", infoLog);
+        glGetShaderInfoLog(fragmentShaderOrange, sizeof(infoLog), nullptr, infoLog);
+        XLOGE("fragmentShaderOrange compile failed:[%s]", infoLog);
+        return false;
+    }
+
+    glGetShaderiv(fragmentShaderYellow, GL_COMPILE_STATUS, &success);
+    if (success == GL_FALSE) {
+        glGetShaderInfoLog(fragmentShaderYellow, sizeof(infoLog), nullptr, infoLog);
+        XLOGE("fragmentShaderYellow compile failed:[%s]", infoLog);
         return false;
     }
     // -------------------------- Compiling a shader end   --------------------
@@ -128,31 +146,41 @@ bool XShader::Init() {
 
     // -------------------------- shader program start --------------------
     // 7. get a shader program
-    shaderProgram = glCreateProgram();
+    shaderProgramOrange = glCreateProgram();
+    shaderProgramYellow = glCreateProgram();
 
     // 8. attach the shaders to the program
-    glAttachShader(shaderProgram, vertexShader);
-    glAttachShader(shaderProgram, fragmentShader);
+    glAttachShader(shaderProgramOrange, vertexShader);
+    glAttachShader(shaderProgramOrange, fragmentShaderOrange);
+    glAttachShader(shaderProgramYellow, vertexShader);
+    glAttachShader(shaderProgramYellow, fragmentShaderYellow);
 
     // 9. link them
-    glLinkProgram(shaderProgram);
+    glLinkProgram(shaderProgramOrange);
 
     // check
-    glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
+    glGetProgramiv(shaderProgramOrange, GL_LINK_STATUS, &success);
     if (success == GL_FALSE) {
-        glGetProgramInfoLog(shaderProgram, sizeof(infoLog), nullptr, infoLog);
-        XLOGE("shaderProgram link failed:[%s]", infoLog);
+        glGetProgramInfoLog(shaderProgramOrange, sizeof(infoLog), nullptr, infoLog);
+        XLOGE("shaderProgramOrange link failed:[%s]", infoLog);
         return false;
     }
 
-    // 10. user program
-    glUseProgram(shaderProgram);
+    glLinkProgram(shaderProgramYellow);
+    glGetProgramiv(shaderProgramYellow,GL_LINK_STATUS, &success);
+    if(success == GL_FALSE){
+        glGetProgramInfoLog(shaderProgramYellow, sizeof(infoLog), nullptr, infoLog);
+        XLOGE("shaderProgramYellow link failed:[%s]", infoLog);
+        return false;
+    }
+
     // -------------------------- shader program end   --------------------
 
 
     // 11. release shaders
     glDeleteShader(vertexShader);
-    glDeleteShader(fragmentShader);
+    glDeleteShader(fragmentShaderOrange);
+    glDeleteShader(fragmentShaderYellow);
 
     return true;
 }
@@ -165,21 +193,27 @@ void XShader::Close() {
         glDeleteBuffers(2, VBO);
     if (EBO)
         glDeleteBuffers(1, &EBO);
-    if (shaderProgram)
-        glDeleteProgram(shaderProgram);
+    if (shaderProgramOrange)
+        glDeleteProgram(shaderProgramOrange);
+    if(shaderProgramYellow)
+        glDeleteProgram(shaderProgramYellow);
 
 }
 
 void XShader::Draw() {
     std::lock_guard<std::mutex> lockGuard(g_mutex);
-    if (!shaderProgram)
+    if (!shaderProgramOrange)
         return;
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    glUseProgram(shaderProgram);
+    glUseProgram(shaderProgramOrange);
     glBindVertexArray(VAO[0]);
     glDrawArrays(GL_TRIANGLES, 0, 3);
+
+    if(!shaderProgramYellow)
+        return;
+    glUseProgram(shaderProgramYellow);
     glBindVertexArray(VAO[1]);
     glDrawArrays(GL_TRIANGLES, 0, 3);
 //    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);

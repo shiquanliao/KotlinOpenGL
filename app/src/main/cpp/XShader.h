@@ -20,8 +20,10 @@ private:
     unsigned int VBO[2]{};
     unsigned int EBO = 0;
     unsigned int vertexShader = 0;
-    unsigned int fragmentShader = 0;
-    unsigned int shaderProgram = 0;
+    unsigned int fragmentShaderOrange = 0;
+    unsigned int fragmentShaderYellow = 0;
+    unsigned int shaderProgramOrange = 0;
+    unsigned int shaderProgramYellow = 0;
     std::mutex g_mutex;
 };
 
