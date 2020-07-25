@@ -16,8 +16,8 @@ public:
     virtual void Draw();
 
 private:
-    unsigned int VAO = 0;
-    unsigned int VBO = 0;
+    unsigned int VAO[2]{};
+    unsigned int VBO[2]{};
     unsigned int EBO = 0;
     unsigned int vertexShader = 0;
     unsigned int fragmentShader = 0;

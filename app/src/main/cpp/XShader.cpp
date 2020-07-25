@@ -30,12 +30,12 @@ bool XShader::Init() {
 
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
-    float vertices[] = {
-            // first triangle
+    float firstTriangle[] = {
             -0.9f, -0.5f, 0.0f,  // left
             -0.0f, -0.5f, 0.0f,  // right
             -0.45f, 0.5f, 0.0f,  // top
-            // second triangle
+    };
+    float secondTriangle[] = {
             0.0f, -0.5f, 0.0f,  // left
             0.9f, -0.5f, 0.0f,  // right
             0.45f, 0.5f, 0.0f   // top
@@ -48,18 +48,18 @@ bool XShader::Init() {
     // -------------------------- handle VBO start --------------------
     // 1. Just like any object in OpenGL, this buffer has a unique ID corresponding to that buffer,
     // so we can generate one with a buffer ID using the glGenVertexArrays/glGenBuffers function:
-    glGenVertexArrays(1, &VAO);
-    glGenBuffers(1, &VBO);
+    glGenVertexArrays(2, VAO);
+    glGenBuffers(2, VBO);
 //    glGenBuffers(1, &EBO);
 
     // 2. bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
-    glBindVertexArray(VAO);
+    glBindVertexArray(VAO[0]);
     // We can bind the newly created buffer(VBO) to the GL_ARRAY_BUFFER target with the glBindBuffer function:
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO[0]);
 //    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 
     // 3. copy data
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(firstTriangle), firstTriangle, GL_STATIC_DRAW);
 //    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
     // tell OpenGL how interpret the vertex data
@@ -72,6 +72,15 @@ bool XShader::Init() {
     // You can unbind the VAO afterwards so other VAO calls won't accidentally modify this VAO, but this rarely happens. Modifying other
     // VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
     glBindVertexArray(0);
+
+    glBindVertexArray(VAO[1]);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO[1]);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(secondTriangle), secondTriangle, GL_STATIC_DRAW);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float),
+                          nullptr); // first parmeter is vertexShader glsl(layout(location = 0) '0')
+    glEnableVertexAttribArray(0);
+    glBindVertexArray(0);
+
 
     // note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
     glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -150,10 +159,10 @@ bool XShader::Init() {
 
 void XShader::Close() {
     std::lock_guard<std::mutex> lockGuard(g_mutex);
-    if (VAO)
-        glDeleteVertexArrays(1, &VAO);
-    if (VBO)
-        glDeleteBuffers(1, &VBO);
+    if (VAO[0] && VAO[1])
+        glDeleteVertexArrays(2, VAO);
+    if (VBO[0] && VBO[1])
+        glDeleteBuffers(2, VBO);
     if (EBO)
         glDeleteBuffers(1, &EBO);
     if (shaderProgram)
@@ -169,8 +178,10 @@ void XShader::Draw() {
     glClear(GL_COLOR_BUFFER_BIT);
 
     glUseProgram(shaderProgram);
-    glBindVertexArray(VAO);
-    glDrawArrays(GL_TRIANGLES, 0, 6);
+    glBindVertexArray(VAO[0]);
+    glDrawArrays(GL_TRIANGLES, 0, 3);
+    glBindVertexArray(VAO[1]);
+    glDrawArrays(GL_TRIANGLES, 0, 3);
 //    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 //    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
 }
