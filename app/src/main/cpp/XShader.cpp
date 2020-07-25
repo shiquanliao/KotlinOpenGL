@@ -31,10 +31,14 @@ bool XShader::Init() {
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
     float vertices[] = {
-            0.5f, 0.5f, 0.0f,  // top right
-            0.5f, -0.5f, 0.0f,  // bottom right
-            -0.5f, -0.5f, 0.0f,  // bottom left
-            -0.5f, 0.5f, 0.0f   // top left
+            // first triangle
+            -0.9f, -0.5f, 0.0f,  // left
+            -0.0f, -0.5f, 0.0f,  // right
+            -0.45f, 0.5f, 0.0f,  // top
+            // second triangle
+            0.0f, -0.5f, 0.0f,  // left
+            0.9f, -0.5f, 0.0f,  // right
+            0.45f, 0.5f, 0.0f   // top
     };
     unsigned int indices[] = { // note that we start from 0!
             0, 1, 3,    // first triangle
@@ -46,17 +50,17 @@ bool XShader::Init() {
     // so we can generate one with a buffer ID using the glGenVertexArrays/glGenBuffers function:
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
-    glGenBuffers(1, &EBO);
+//    glGenBuffers(1, &EBO);
 
     // 2. bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
     glBindVertexArray(VAO);
     // We can bind the newly created buffer(VBO) to the GL_ARRAY_BUFFER target with the glBindBuffer function:
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+//    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 
     // 3. copy data
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+//    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
     // tell OpenGL how interpret the vertex data
     // configure vertex attributes(s)
@@ -166,7 +170,7 @@ void XShader::Draw() {
 
     glUseProgram(shaderProgram);
     glBindVertexArray(VAO);
-//    glDrawArrays(GL_TRIANGLES, 0, 3);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
 //    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
+//    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
 }
