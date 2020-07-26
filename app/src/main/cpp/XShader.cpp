@@ -12,23 +12,27 @@
 
 const char *vertexShaderSource = "#version 300 es\n"
                                  "layout (location = 0) in vec3 aPos;\n"
+                                 "layout (location = 1) in vec3 aColor;\n"
+                                 "out vec3 ourColor;"
                                  "void main()\n"
                                  "{\n"
-                                 "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
+                                 "   gl_Position = vec4(aPos, 1.0);\n"
+                                 "   ourColor =  aColor;\n"
                                  "}\0";
 const char *fragmentShaderSource = "#version 300 es\n"
                                    "precision mediump float;\n"
-                                   "uniform vec4 ourColor;\n"
+                                   "in vec3 ourColor;\n"
                                    "out vec4 fragmentColor;\n"
                                    "void main()\n"
                                    "{\n"
-                                   "   fragmentColor = ourColor;\n"
+                                   "   fragmentColor = vec4(ourColor, 1.0);\n"
                                    "}\n\0";
 
 
-static int64_t getCurrentLocalTimeStamp(){
-    std::chrono::time_point<std::chrono::system_clock,std::chrono::milliseconds> tp =
-            std::chrono::time_point_cast<std::chrono::milliseconds>(std::chrono::system_clock::now());
+static int64_t getCurrentLocalTimeStamp() {
+    std::chrono::time_point<std::chrono::system_clock, std::chrono::milliseconds> tp =
+            std::chrono::time_point_cast<std::chrono::milliseconds>(
+                    std::chrono::system_clock::now());
     auto tmp = std::chrono::duration_cast<std::chrono::milliseconds>(tp.time_since_epoch());
     return tmp.count();
 }
@@ -40,9 +44,10 @@ bool XShader::Init() {
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
     float vertices[] = {
-            -0.5f, -0.5f, 0.0f, // left
-            0.5f, -0.5f, 0.0f, // right
-            0.0f, 0.5f, 0.0f  // top
+            // positions         // colors
+            0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f,   // bottom right
+            -0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f,   // bottom left
+            0.0f, 0.5f, 0.0f, 0.0f, 0.0f, 1.0f    // top
     };
 
     // -------------------------- handle VBO start --------------------
@@ -61,9 +66,15 @@ bool XShader::Init() {
 
     // tell OpenGL how interpret the vertex data
     // configure vertex attributes(s)
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float),
+    // position attribute
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float),
                           nullptr); // first parmeter is vertexShader glsl(layout(location = 0) '0')
     glEnableVertexAttribArray(0);
+
+    // color attrubute
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float),
+                          reinterpret_cast<const void *>(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
 
     // note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
     glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -162,10 +173,5 @@ void XShader::Draw() {
     glUseProgram(shaderProgram);
     glBindVertexArray(VAO);
 
-    // change color
-    double greenValue = sin(startTime++ / 30.0f) / 2.0f + 0.5f;
-    int vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
-    glUniform4f(vertexColorLocation,0.0f, greenValue, 0.0f, 1.0f);
-//    XLOGE("------------------------: %f",greenValue);
     glDrawArrays(GL_TRIANGLES, 0, 3);
 }
