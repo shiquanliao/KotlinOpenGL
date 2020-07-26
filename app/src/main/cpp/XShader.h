@@ -16,14 +16,12 @@ public:
     virtual void Draw();
 
 private:
-    unsigned int VAO[2]{};
-    unsigned int VBO[2]{};
-    unsigned int EBO = 0;
+    unsigned int VAO = 0;
+    unsigned int VBO = 0;
     unsigned int vertexShader = 0;
-    unsigned int fragmentShaderOrange = 0;
-    unsigned int fragmentShaderYellow = 0;
-    unsigned int shaderProgramOrange = 0;
-    unsigned int shaderProgramYellow = 0;
+    unsigned int fragmentShader = 0;
+    unsigned int shaderProgram = 0;
+    int64_t startTime = 0;
     std::mutex g_mutex;
 };
 
