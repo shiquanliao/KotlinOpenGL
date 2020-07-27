@@ -97,8 +97,8 @@ private:
 
     void createProgram(std::string &vertexCode, std::string &fragmentCode) {
 
-        clearChar(vertexCode);
-        clearChar(fragmentCode);
+//        clearChar(vertexCode);
+//        clearChar(fragmentCode);
         const char *vShaderCode = vertexCode.c_str();
         const char *fShaderCode = fragmentCode.c_str();
 
