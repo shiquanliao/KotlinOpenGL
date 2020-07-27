@@ -13,7 +13,7 @@ private:
     std::mutex g_mutex;
     XShader shader;
 public:
-    bool Init(void *win) override {
+    bool Init(void *win, std::string &vertexCode, std::string &fragmentCode) override {
         XEGL::Get()->Close();
         // todo shader should be close here.
         shader.Close();
@@ -29,7 +29,7 @@ public:
         }
 
         // todo shader should be init here.
-        shader.Init();
+        shader.Init(vertexCode, fragmentCode);
 
         return true;
     }

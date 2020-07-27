@@ -1,5 +1,7 @@
 #include <jni.h>
 #include <string>
+#include <android/asset_manager_jni.h>
+#include <utils.h>
 #include "EGLThread.h"
 #include "XLog.h"
 #include "GLES3/gl3.h"
@@ -8,6 +10,8 @@
 #include "pthread.h"
 
 EGLThread *eglThread = NULL;
+std::string vertexShaderCode;
+std::string fragmentShaderCode;
 
 void callBackOnCreate() {
     XLOGE("callBackOnCreate");
@@ -44,7 +48,7 @@ Java_com_example_kotlinopengl_JNIUtils_nativeSurfaceCreate(JNIEnv *env, jobject 
     eglThread->setRenderModule(RENDER_MODULE_AUTO);
 
     ANativeWindow *nativeWindow = ANativeWindow_fromSurface(env, surface_view);
-    eglThread->onSurfaceCreate(nativeWindow);
+    eglThread->onSurfaceCreate(nativeWindow, vertexShaderCode, fragmentShaderCode);
 }
 
 
@@ -70,3 +74,10 @@ Java_com_example_kotlinopengl_JNIUtils_nativeSurfaceDestroyed(JNIEnv *env, jobje
     }
 }
 
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_example_kotlinopengl_JNIUtils_init(JNIEnv *env, jobject thiz, jobject asset_manager) {
+    AAssetManager* aAssetManager = AAssetManager_fromJava(env, asset_manager);
+    extractFile(aAssetManager,"vshader.glsl",vertexShaderCode);
+    extractFile(aAssetManager,"fshader.glsl",fragmentShaderCode);
+}

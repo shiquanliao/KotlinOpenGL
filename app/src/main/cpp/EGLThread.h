@@ -6,6 +6,7 @@
 #define KOTLINOPENGL_EGLTHREAD_H
 
 #include <EGL/egl.h>
+#include <string>
 #include "pthread.h"
 
 
@@ -24,7 +25,8 @@ class EGLThread {
 public:
     friend void *eglThreadImpl(void *context);
 
-    void onSurfaceCreate(EGLNativeWindowType window);
+    void onSurfaceCreate(EGLNativeWindowType window, std::string &vertexCode,
+                         std::string &fragmentCode);
 
     void onSurfaceChange(int width, int height);
 
@@ -49,6 +51,8 @@ private:
     pthread_mutex_t pthread_mutex;
     pthread_cond_t pthread_cond;
     ANativeWindow *m_ANativeWindow;
+    std::string m_VertexCode;
+    std::string m_FragmentCode;
     bool isCreate;
     bool isChange;
     bool isExit;

@@ -4,9 +4,9 @@
 
 #include "XShader.h"
 #include "XLog.h"
+#include "shader_s.h"
 #include <GLES3/gl3.h>
 #include <ctime>
-
 
 #define GET_STR(x) #x
 
@@ -37,7 +37,7 @@ static int64_t getCurrentLocalTimeStamp() {
     return tmp.count();
 }
 
-bool XShader::Init() {
+bool XShader::Init(std::string &vertexCode, std::string &fragmentCode) {
     Close();
     std::lock_guard<std::mutex> lockGuard(g_mutex);
 
@@ -86,69 +86,12 @@ bool XShader::Init() {
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     // -------------------------- handle VBO end  --------------------
 
+    std::string vertexCodeTest = vertexShaderSource;
+    std::string fragmentCodeTest = fragmentShaderSource;
 
 
-    // -------------------------- Compiling a shader start --------------------
-    // 4. like step1, get the xxxShader ID
-    vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-
-    // 5. attach the source code to the xxxShader
-    glShaderSource(vertexShader, 1, &vertexShaderSource, 0);
-    glShaderSource(fragmentShader, 1, &fragmentShaderSource, 0);
-
-    // 6. compile the vertexShader
-    glCompileShader(vertexShader);
-    glCompileShader(fragmentShader);
-
-    // check
-    // Q: 'iv' at the end of glGetShaderiv() stand for?
-    // A: It describes the parameters returned, in this case a “vector” of "ints"
-    int success;
-    char infoLog[512];
-    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-    if (success == GL_FALSE) {
-        glGetShaderInfoLog(vertexShader, sizeof(infoLog), nullptr, infoLog);
-        XLOGE("vertexShader compile failed:[%s]", infoLog);
-        return false;
-    }
-
-    glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-    if (success == GL_FALSE) {
-        glGetShaderInfoLog(fragmentShader, sizeof(infoLog), nullptr, infoLog);
-        XLOGE("fragmentShader compile failed:[%s]", infoLog);
-        return false;
-    }
-    // -------------------------- Compiling a shader end   --------------------
-
-
-    // -------------------------- shader program start --------------------
-    // 7. get a shader program
-    shaderProgram = glCreateProgram();
-
-    // 8. attach the shaders to the program
-    glAttachShader(shaderProgram, vertexShader);
-    glAttachShader(shaderProgram, fragmentShader);
-
-    // 9. link them
-    glLinkProgram(shaderProgram);
-
-    // check
-    glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-    if (success == GL_FALSE) {
-        glGetProgramInfoLog(shaderProgram, sizeof(infoLog), nullptr, infoLog);
-        XLOGE("shaderProgram link failed:[%s]", infoLog);
-        return false;
-    }
-
-    // 10. user program
-    glUseProgram(shaderProgram);
-    // -------------------------- shader program end   --------------------
-
-
-    // 11. release shaders
-    glDeleteShader(vertexShader);
-    glDeleteShader(fragmentShader);
+//    shader = new Shader(vertexCodeTest, fragmentCodeTest);
+    shader = new Shader(vertexCode, fragmentCode);
     return true;
 }
 
@@ -158,19 +101,20 @@ void XShader::Close() {
         glDeleteVertexArrays(1, &VAO);
     if (VBO)
         glDeleteBuffers(1, &VBO);
-    if (shaderProgram)
-        glDeleteProgram(shaderProgram);
-
+    if(shader != nullptr){
+        delete shader;
+        shader = nullptr;
+    }
 }
 
 void XShader::Draw() {
     std::lock_guard<std::mutex> lockGuard(g_mutex);
-    if (!shaderProgram)
+    if (shader == nullptr)
         return;
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    glUseProgram(shaderProgram);
+    shader->use();
     glBindVertexArray(VAO);
 
     glDrawArrays(GL_TRIANGLES, 0, 3);

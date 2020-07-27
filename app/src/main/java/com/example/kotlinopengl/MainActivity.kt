@@ -1,5 +1,6 @@
 package com.example.kotlinopengl
 
+import android.content.res.AssetManager
 import android.graphics.Point
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -19,6 +20,7 @@ class MainActivity : AppCompatActivity() {
 //        var point = Point()
 //        windowManager.defaultDisplay.getSize(point)
 //        nativeSurfaceView.holder.setFixedSize(100,100)
+        JNIUtils.init(assets)
     }
 
     /**
@@ -38,11 +40,13 @@ object JNIUtils {
     init {
         System.loadLibrary("native-lib")
     }
+
+    external fun init(assetManager: AssetManager)
     external fun stringFromJNI(): String
 
-    external fun nativeSurfaceCreate(surfaceView: Surface);
+    external fun nativeSurfaceCreate(surfaceView: Surface)
 
-    external fun nativeSurfaceChanged(width: Int, height: Int);
+    external fun nativeSurfaceChanged(width: Int, height: Int)
 
-    external fun nativeSurfaceDestroyed();
+    external fun nativeSurfaceDestroyed()
 }

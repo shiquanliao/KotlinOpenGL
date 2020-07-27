@@ -6,10 +6,11 @@
 #define KOTLINOPENGL_XSHADER_H
 
 #include <mutex>
+#include <shader_s.h>
 
 class XShader {
 public:
-    virtual bool Init();
+    virtual bool Init(std::string &vertexCode, std::string &fragmentCode);
 
     virtual void Close();
 
@@ -18,10 +19,7 @@ public:
 private:
     unsigned int VAO = 0;
     unsigned int VBO = 0;
-    unsigned int vertexShader = 0;
-    unsigned int fragmentShader = 0;
-    unsigned int shaderProgram = 0;
-    int64_t startTime = 0;
+    Shader *shader = nullptr;
     std::mutex g_mutex;
 };
 
