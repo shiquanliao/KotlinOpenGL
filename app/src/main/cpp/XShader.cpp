@@ -92,6 +92,8 @@ bool XShader::Init(std::string &vertexCode, std::string &fragmentCode) {
 
 //    shader = new Shader(vertexCodeTest, fragmentCodeTest);
     shader = new Shader(vertexCode, fragmentCode);
+    shader->use();
+    shader->setFloat("xOffset", 0.5f);
     return true;
 }
 
