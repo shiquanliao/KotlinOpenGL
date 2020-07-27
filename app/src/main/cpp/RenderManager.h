@@ -6,6 +6,8 @@
 #define KOTLINOPENGL_RENDERMANAGER_H
 
 
+#include "XShader.h"
+
 class RenderManager {
 public:
     static RenderManager *GetInstance();
@@ -15,6 +17,8 @@ public:
     virtual void Draw() = 0;
 
     virtual void Close() = 0;
+
+    virtual void move(XYOffSet& xyOffSet) = 0;
 
     virtual ~RenderManager() {};
 protected:

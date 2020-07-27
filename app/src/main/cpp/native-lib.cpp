@@ -14,18 +14,18 @@ std::string vertexShaderCode;
 std::string fragmentShaderCode;
 
 void callBackOnCreate() {
-    XLOGE("callBackOnCreate");
+//    XLOGE("callBackOnCreate");
 }
 
 void callBackOnChange(int width, int height) {
     glViewport(0, 0, width, height);
-    XLOGE("callBackOnChange");
+//    XLOGE("callBackOnChange");
 }
 
 void callBackOnDraw() {
 //    glClearColor(0.0f, 0.3f, 0.3f, 1.0f);
 //    glClear(GL_COLOR_BUFFER_BIT);
-    XLOGE("callBackOnDraw");
+//    XLOGE("callBackOnDraw");
 }
 
 extern "C" JNIEXPORT jstring JNICALL
@@ -80,4 +80,11 @@ Java_com_example_kotlinopengl_JNIUtils_init(JNIEnv *env, jobject thiz, jobject a
     AAssetManager* aAssetManager = AAssetManager_fromJava(env, asset_manager);
     extractFile(aAssetManager,"vshader.glsl",vertexShaderCode);
     extractFile(aAssetManager,"fshader.glsl",fragmentShaderCode);
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_example_kotlinopengl_JNIUtils_moveXY(JNIEnv *env, jobject thiz, jfloat x, jfloat y) {
+    eglThread->moveXY(x, y);
+    XLOGE("native-lib moveXY: x is:%f, y is:%f", x, y);
 }

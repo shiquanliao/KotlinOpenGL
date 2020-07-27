@@ -44,6 +44,8 @@ object JNIUtils {
     external fun init(assetManager: AssetManager)
     external fun stringFromJNI(): String
 
+    external fun moveXY(x:Float, y:Float)
+
     external fun nativeSurfaceCreate(surfaceView: Surface)
 
     external fun nativeSurfaceChanged(width: Int, height: Int)

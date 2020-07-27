@@ -42,6 +42,10 @@ public:
         XEGL::Get()->Draw();
     }
 
+    void move(XYOffSet &xyOffSet) override {
+        shader.setOffset(xyOffSet);
+    }
+
     void Close() override {
         std::lock_guard<std::mutex> lockGuard(g_mutex);
 

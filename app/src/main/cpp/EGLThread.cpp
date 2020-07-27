@@ -98,9 +98,10 @@ void *eglThreadImpl(void *context) {
 
         if (eglThread->isStart) {
             eglThread->onDraw();
+            renderManager->move(eglThread->xyOffSet);
             renderManager->Draw();
             if (eglThread->renderType == RENDER_MODULE_AUTO) {
-                usleep(1000000 );
+                usleep(1000000 / 60 );
             } else {
                 pthread_mutex_lock(&eglThread->pthread_mutex);
                 pthread_cond_wait(&eglThread->pthread_cond, &eglThread->pthread_mutex);
@@ -117,6 +118,11 @@ void *eglThreadImpl(void *context) {
 
 void EGLThread::setIsExit(bool exit) {
     EGLThread::isExit = exit;
+}
+
+void EGLThread::moveXY(float x, float y) {
+    xyOffSet.x = x;
+    xyOffSet.y = y;
 }
 
 

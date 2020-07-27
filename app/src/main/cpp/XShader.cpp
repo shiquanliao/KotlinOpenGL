@@ -8,25 +8,6 @@
 #include <GLES3/gl3.h>
 #include <ctime>
 
-#define GET_STR(x) #x
-
-const char *vertexShaderSource = "#version 300 es\n"
-                                 "layout (location = 0) in vec3 aPos;\n"
-                                 "layout (location = 1) in vec3 aColor;\n"
-                                 "out vec3 ourColor;"
-                                 "void main()\n"
-                                 "{\n"
-                                 "   gl_Position = vec4(aPos, 1.0);\n"
-                                 "   ourColor =  aColor;\n"
-                                 "}\0";
-const char *fragmentShaderSource = "#version 300 es\n"
-                                   "precision mediump float;\n"
-                                   "in vec3 ourColor;\n"
-                                   "out vec4 fragmentColor;\n"
-                                   "void main()\n"
-                                   "{\n"
-                                   "   fragmentColor = vec4(ourColor, 1.0);\n"
-                                   "}\n\0";
 
 
 static int64_t getCurrentLocalTimeStamp() {
@@ -86,14 +67,8 @@ bool XShader::Init(std::string &vertexCode, std::string &fragmentCode) {
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     // -------------------------- handle VBO end  --------------------
 
-    std::string vertexCodeTest = vertexShaderSource;
-    std::string fragmentCodeTest = fragmentShaderSource;
 
-
-//    shader = new Shader(vertexCodeTest, fragmentCodeTest);
     shader = new Shader(vertexCode, fragmentCode);
-    shader->use();
-    shader->setFloat("xOffset", 0.5f);
     return true;
 }
 
@@ -103,7 +78,7 @@ void XShader::Close() {
         glDeleteVertexArrays(1, &VAO);
     if (VBO)
         glDeleteBuffers(1, &VBO);
-    if(shader != nullptr){
+    if (shader != nullptr) {
         delete shader;
         shader = nullptr;
     }
@@ -117,7 +92,13 @@ void XShader::Draw() {
     glClear(GL_COLOR_BUFFER_BIT);
 
     shader->use();
+    shader->setFloat("xOffset", xyOffSet.x);
+    shader->setFloat("yOffset", xyOffSet.y);
     glBindVertexArray(VAO);
 
     glDrawArrays(GL_TRIANGLES, 0, 3);
+}
+
+void XShader::setOffset(XYOffSet &offSet) {
+    this->xyOffSet = offSet;
 }

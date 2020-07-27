@@ -8,6 +8,7 @@
 #include <EGL/egl.h>
 #include <string>
 #include "pthread.h"
+#include "XShader.h"
 
 
 #define RENDER_MODULE_AUTO 1
@@ -40,6 +41,7 @@ public:
 
     void callBackOnDraw(OnDraw draw);
 
+    void moveXY(float x, float y);
 
     EGLThread();
 
@@ -64,7 +66,7 @@ private:
     int renderType;
     int surfaceWidth = 0;
     int surfaceHeight = 0;
-
+    XYOffSet xyOffSet{0.0f, 0.0f};
 
     OnCreate onCreate{};
 
