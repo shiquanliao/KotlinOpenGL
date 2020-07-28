@@ -26,8 +26,9 @@ class EGLThread {
 public:
     friend void *eglThreadImpl(void *context);
 
-    void onSurfaceCreate(EGLNativeWindowType window, std::string &vertexCode,
-                         std::string &fragmentCode);
+    void
+    onSurfaceCreate(EGLNativeWindowType window, std::string &vertexCode, std::string &fragmentCode,
+                    TextureInfo &texInfo);
 
     void onSurfaceChange(int width, int height);
 
@@ -55,6 +56,7 @@ private:
     ANativeWindow *m_ANativeWindow;
     std::string m_VertexCode;
     std::string m_FragmentCode;
+    TextureInfo *m_TextureInfo;
     bool isCreate;
     bool isChange;
     bool isExit;
@@ -75,7 +77,6 @@ private:
     OnDraw onDraw{};
 
 };
-
 
 
 #endif //KOTLINOPENGL_EGLTHREAD_H

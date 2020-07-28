@@ -12,7 +12,8 @@ class RenderManager {
 public:
     static RenderManager *GetInstance();
 
-    virtual bool Init(void *win, std::string &vertexCode, std::string &fragmentCode) = 0;
+    virtual bool Init(void *win, std::string &vertexCode, std::string &fragmentCode,
+                      TextureInfo texInfo) = 0;
 
     virtual void Draw() = 0;
 

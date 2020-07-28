@@ -13,9 +13,17 @@ typedef struct XYOffSet{
     float y;
 } XYOffSet;
 
+typedef struct {
+    unsigned char* buffer;
+    int width;
+    int height;
+    int nrChannels;
+} TextureInfo;
+
 class XShader {
 public:
-    virtual bool Init(std::string &vertexCode, std::string &fragmentCode);
+    virtual bool
+    Init(std::string &vertexCode, std::string &fragmentCode, TextureInfo& texInfo);
 
     virtual void Close();
 
@@ -26,6 +34,8 @@ public:
 private:
     unsigned int VAO = 0;
     unsigned int VBO = 0;
+    unsigned int EBO = 0;
+    unsigned int texture = 0;
     XYOffSet xyOffSet{0.0f, 0.0f};
     Shader *shader = nullptr;
     std::mutex g_mutex;

@@ -9,9 +9,19 @@
 #include "android/native_window_jni.h"
 #include "pthread.h"
 
-EGLThread *eglThread = NULL;
+#define STB_IMAGE_IMPLEMENTATION
+
+#include "stb_image.h"
+
+
+#define VERTEXSHADER "vshader.glsl"
+#define FRAGMENTSHADER "fshader.glsl"
+#define TEXTURE_IMAGE "wall.jpg"
+
+EGLThread *eglThread = nullptr;
 std::string vertexShaderCode;
 std::string fragmentShaderCode;
+TextureInfo textureInfo{};
 
 void callBackOnCreate() {
 //    XLOGE("callBackOnCreate");
@@ -48,7 +58,8 @@ Java_com_example_kotlinopengl_JNIUtils_nativeSurfaceCreate(JNIEnv *env, jobject 
     eglThread->setRenderModule(RENDER_MODULE_AUTO);
 
     ANativeWindow *nativeWindow = ANativeWindow_fromSurface(env, surface_view);
-    eglThread->onSurfaceCreate(nativeWindow, vertexShaderCode, fragmentShaderCode);
+    eglThread->onSurfaceCreate(nativeWindow, vertexShaderCode, fragmentShaderCode, textureInfo);
+    releaseTextureInfo(&textureInfo.buffer);
 }
 
 
@@ -68,7 +79,7 @@ Java_com_example_kotlinopengl_JNIUtils_nativeSurfaceDestroyed(JNIEnv *env, jobje
     if (eglThread) {
         eglThread->setIsExit(true);
         //等待线程结束
-        pthread_join(reinterpret_cast<pthread_t>(eglThread), 0);
+        pthread_join(reinterpret_cast<pthread_t>(eglThread), nullptr);
         delete (eglThread);
         eglThread = nullptr;
     }
@@ -77,9 +88,11 @@ Java_com_example_kotlinopengl_JNIUtils_nativeSurfaceDestroyed(JNIEnv *env, jobje
 extern "C"
 JNIEXPORT void JNICALL
 Java_com_example_kotlinopengl_JNIUtils_init(JNIEnv *env, jobject thiz, jobject asset_manager) {
-    AAssetManager* aAssetManager = AAssetManager_fromJava(env, asset_manager);
-    extractFile(aAssetManager,"vshader.glsl",vertexShaderCode);
-    extractFile(aAssetManager,"fshader.glsl",fragmentShaderCode);
+    AAssetManager *aAssetManager = AAssetManager_fromJava(env, asset_manager);
+    extractFile(aAssetManager, VERTEXSHADER, vertexShaderCode);
+    extractFile(aAssetManager, FRAGMENTSHADER, fragmentShaderCode);
+    getTextureInfo(aAssetManager, TEXTURE_IMAGE, &textureInfo.width, &textureInfo.height,
+                   &textureInfo.nrChannels, &textureInfo.buffer);
 }
 
 extern "C"
