@@ -16,7 +16,8 @@
 
 #define VERTEXSHADER "vshader.glsl"
 #define FRAGMENTSHADER "fshader.glsl"
-#define TEXTURE_IMAGE "wall.jpg"
+#define TEXTURE_IMAGE_WALL "wall.jpg"
+#define TEXTURE_IMAGE_CONTAINER "container.jpg"
 
 EGLThread *eglThread = nullptr;
 std::string vertexShaderCode;
@@ -91,7 +92,7 @@ Java_com_example_kotlinopengl_JNIUtils_init(JNIEnv *env, jobject thiz, jobject a
     AAssetManager *aAssetManager = AAssetManager_fromJava(env, asset_manager);
     extractFile(aAssetManager, VERTEXSHADER, vertexShaderCode);
     extractFile(aAssetManager, FRAGMENTSHADER, fragmentShaderCode);
-    getTextureInfo(aAssetManager, TEXTURE_IMAGE, &textureInfo.width, &textureInfo.height,
+    getTextureInfo(aAssetManager, TEXTURE_IMAGE_CONTAINER, &textureInfo.width, &textureInfo.height,
                    &textureInfo.nrChannels, &textureInfo.buffer);
 }
 
