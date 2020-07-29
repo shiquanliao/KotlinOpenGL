@@ -9,7 +9,9 @@
 #include <android/asset_manager_jni.h>
 #include <string>
 #include "../XLog.h"
-#include "stb_image.h"
+
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image.h>
 
 void extractFile(AAssetManager *aAssetManager, const char *fileName, std::string &fileString) {
     AAsset *aAsset = AAssetManager_open(aAssetManager, fileName, AASSET_MODE_UNKNOWN);

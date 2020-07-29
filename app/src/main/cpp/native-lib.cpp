@@ -9,10 +9,6 @@
 #include "android/native_window_jni.h"
 #include "pthread.h"
 
-#define STB_IMAGE_IMPLEMENTATION
-
-#include "stb_image.h"
-
 
 #define VERTEXSHADER "vshader.glsl"
 #define FRAGMENTSHADER "fshader.glsl"
