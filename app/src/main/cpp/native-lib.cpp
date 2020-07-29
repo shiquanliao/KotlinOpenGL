@@ -14,11 +14,14 @@
 #define FRAGMENTSHADER "fshader.glsl"
 #define TEXTURE_IMAGE_WALL "wall.jpg"
 #define TEXTURE_IMAGE_CONTAINER "container.jpg"
+#define TEXTURE_IMAGE_FACE "awesomeface.png"
 
 EGLThread *eglThread = nullptr;
 std::string vertexShaderCode;
 std::string fragmentShaderCode;
-TextureInfo textureInfo{};
+TextureInfo tex1{};
+TextureInfo tex2{};
+TextureInfo textureInfos[] = {tex1, tex2};
 
 void callBackOnCreate() {
 //    XLOGE("callBackOnCreate");
@@ -55,8 +58,10 @@ Java_com_example_kotlinopengl_JNIUtils_nativeSurfaceCreate(JNIEnv *env, jobject 
     eglThread->setRenderModule(RENDER_MODULE_AUTO);
 
     ANativeWindow *nativeWindow = ANativeWindow_fromSurface(env, surface_view);
-    eglThread->onSurfaceCreate(nativeWindow, vertexShaderCode, fragmentShaderCode, textureInfo);
-    releaseTextureInfo(&textureInfo.buffer);
+    eglThread->onSurfaceCreate(nativeWindow, vertexShaderCode, fragmentShaderCode,
+                               reinterpret_cast<TextureInfo (&)[]>(textureInfos));
+    releaseTextureInfo(&textureInfos[0].buffer);
+    releaseTextureInfo(&textureInfos[1].buffer);
 }
 
 
@@ -88,8 +93,10 @@ Java_com_example_kotlinopengl_JNIUtils_init(JNIEnv *env, jobject thiz, jobject a
     AAssetManager *aAssetManager = AAssetManager_fromJava(env, asset_manager);
     extractFile(aAssetManager, VERTEXSHADER, vertexShaderCode);
     extractFile(aAssetManager, FRAGMENTSHADER, fragmentShaderCode);
-    getTextureInfo(aAssetManager, TEXTURE_IMAGE_CONTAINER, &textureInfo.width, &textureInfo.height,
-                   &textureInfo.nrChannels, &textureInfo.buffer);
+    getTextureInfo(aAssetManager, TEXTURE_IMAGE_CONTAINER, &textureInfos[0].width, &textureInfos[0].height,
+                   &textureInfos[0].nrChannels, &textureInfos[0].buffer);
+    getTextureInfo(aAssetManager, TEXTURE_IMAGE_FACE, &textureInfos[1].width, &textureInfos[1].height,
+            &textureInfos[1].nrChannels, &textureInfos[1].buffer);
 }
 
 extern "C"

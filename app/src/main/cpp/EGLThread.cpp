@@ -26,13 +26,13 @@ EGLThread::~EGLThread() {
 
 void EGLThread::onSurfaceCreate(EGLNativeWindowType window, std::string &vertexCode,
                                 std::string &fragmentCode,
-                                TextureInfo& texInfo) {
+                                TextureInfo (&texInfos)[]) {
     if (mEglThread == -1) {
         isCreate = true;
         m_ANativeWindow = window;
         m_VertexCode = vertexCode;
         m_FragmentCode = fragmentCode;
-        m_TextureInfo = &texInfo;
+        m_TextureInfos = &texInfos;
         pthread_create(&mEglThread, nullptr, eglThreadImpl, this);
     }
 }
@@ -82,7 +82,7 @@ void *eglThreadImpl(void *context) {
     RenderManager *renderManager = RenderManager::GetInstance();
 
     if (!renderManager->Init(eglThread->m_ANativeWindow, eglThread->m_VertexCode,
-                             eglThread->m_FragmentCode, *eglThread->m_TextureInfo)) {
+                             eglThread->m_FragmentCode, *eglThread->m_TextureInfos)) {
         XLOGE("XEGL init error");
         return nullptr;
     }
@@ -104,7 +104,7 @@ void *eglThreadImpl(void *context) {
             renderManager->move(eglThread->xyOffSet);
             renderManager->Draw();
             if (eglThread->renderType == RENDER_MODULE_AUTO) {
-                usleep(1000000 / 60 );
+                usleep(1000000 / 60);
             } else {
                 pthread_mutex_lock(&eglThread->pthread_mutex);
                 pthread_cond_wait(&eglThread->pthread_cond, &eglThread->pthread_mutex);

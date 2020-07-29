@@ -38,6 +38,7 @@ void getTextureInfo(AAssetManager *aAssetManager, const char *fileName, int *w, 
         XLOGE("getTextureInfo AAsset is null");
         return;
     }
+    stbi_set_flip_vertically_on_load(true); // tell stb_image.h to flip loaded texture's on the y-axis.
     off_t bufferSize = AAsset_getLength(aAsset);
     unsigned char *fileData = (unsigned char *) AAsset_getBuffer(aAsset);
     *buffer = stbi_load_from_memory(fileData, bufferSize, w, h, nr, 0);

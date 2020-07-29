@@ -17,7 +17,7 @@ static int64_t getCurrentLocalTimeStamp() {
     return tmp.count();
 }
 
-bool XShader::Init(std::string &vertexCode, std::string &fragmentCode, TextureInfo &texInfo) {
+bool XShader::Init(std::string &vertexCode, std::string &fragmentCode, TextureInfo (&texInfos)[]) {
     Close();
     std::lock_guard<std::mutex> lockGuard(g_mutex);
 
@@ -79,20 +79,44 @@ bool XShader::Init(std::string &vertexCode, std::string &fragmentCode, TextureIn
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     // -------------------------- handle VBO end  --------------------
 
-    // -------------------------- texture start  --------------------
-    glGenTextures(1, &texture);
-    glBindTexture(GL_TEXTURE_2D, texture);
-    // set the texture wrapping/filtering options (on the currently bound texture object)
+    // -------------------------- texture1 start  --------------------
+    // texture 1
+    glGenTextures(1, &texture1);
+    glBindTexture(GL_TEXTURE_2D, texture1);
+    // set the texture1 wrapping/filtering options (on the currently bound texture1 object)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, texInfo.width, texInfo.height, 0, GL_RGB,
-                 GL_UNSIGNED_BYTE, texInfo.buffer);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, texInfos[0].width, texInfos[0].height, 0, GL_RGB,
+                 GL_UNSIGNED_BYTE, texInfos[0].buffer);
     glGenerateMipmap(GL_TEXTURE_2D);
-    // -------------------------- texture end    --------------------
+
+    // texture 2
+    glGenTextures(1, &texture2);
+    glBindTexture(GL_TEXTURE_2D, texture2);
+    // set the texture wrapping parameters
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);  // set texture wrapping to GL_REPEAT (default wrapping method)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    // set texture filtering parameters
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    // load image, create texture and generate mipmaps
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texInfos[1].width, texInfos[1].height, 0, GL_RGBA,
+                 GL_UNSIGNED_BYTE, texInfos[1].buffer);
+    glGenerateMipmap(GL_TEXTURE_2D);
+    // -------------------------- texture1 end    --------------------
 
     shader = new Shader(vertexCode, fragmentCode);
+
+    // tell opengl for each sampler to which texture unit it belongs to (only has to be done once)
+    // -------------------------------------------------------------------------------------------
+    shader->use(); // don't forget to activate/use the shader before setting uniforms!
+    // either set it manually like so:
+    glUniform1i(glGetUniformLocation(shader->getId(), "texture1"), 0);
+    // or set it via the texture class
+    shader->setInt("texture2", 1);
+
     return true;
 }
 
@@ -120,7 +144,10 @@ void XShader::Draw() {
     shader->use();
     shader->setFloat("xOffset", xyOffSet.x);
     shader->setFloat("yOffset", xyOffSet.y);
-    glBindTexture(GL_TEXTURE_2D, texture);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, texture1);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, texture2);
     glBindVertexArray(VAO);
 
 //    glDrawArrays(GL_TRIANGLES, 0, 3);

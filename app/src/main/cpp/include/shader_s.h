@@ -86,11 +86,17 @@ public:
 private:
     // the program ID
     unsigned int ID;
+public:
+    unsigned int getId() const {
+        return ID;
+    }
 
-    void  clearChar(std::string& str){
+private:
+
+    void clearChar(std::string &str) {
         std::string temp;
-        for(auto character : str){
-            if(character != '\r') temp.append(reinterpret_cast<const char *>(&character));
+        for (auto character : str) {
+            if (character != '\r') temp.append(reinterpret_cast<const char *>(&character));
         }
         str = temp;
     }
