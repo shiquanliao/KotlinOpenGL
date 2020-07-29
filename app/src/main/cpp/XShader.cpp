@@ -25,10 +25,10 @@ bool XShader::Init(std::string &vertexCode, std::string &fragmentCode, TextureIn
     // ------------------------------------------------------------------
     float vertices[] = {
             // positions          // colors           // texture coords
-            0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f,   // top right
-            0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,   // bottom right
+            0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 4.0f, 4.0f,   // top right
+            0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 4.0f, 0.0f,   // bottom right
             -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,   // bottom left
-            -0.5f, 0.5f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f    // top left
+            -0.5f, 0.5f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 4.0f    // top left
     };
 
     unsigned int indices[] = {  // note that we start from 0!
@@ -99,8 +99,8 @@ bool XShader::Init(std::string &vertexCode, std::string &fragmentCode, TextureIn
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);  // set texture wrapping to GL_REPEAT (default wrapping method)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     // set texture filtering parameters
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_MIRRORED_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_MIRRORED_REPEAT);
     // load image, create texture and generate mipmaps
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texInfos[1].width, texInfos[1].height, 0, GL_RGBA,
                  GL_UNSIGNED_BYTE, texInfos[1].buffer);
