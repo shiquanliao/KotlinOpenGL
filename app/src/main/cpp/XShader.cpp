@@ -7,6 +7,9 @@
 #include "shader_s.h"
 #include <GLES3/gl3.h>
 #include <ctime>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 
 static int64_t getCurrentLocalTimeStamp() {
@@ -17,10 +20,21 @@ static int64_t getCurrentLocalTimeStamp() {
     return tmp.count();
 }
 
+
+static void glmFuncTest() {
+    glm::vec4 vec(1.0f, 0.0f, 0.0f, 1.0f);
+    glm::mat4 trans = glm::mat4(1.0f);
+    trans = glm::translate(trans, glm::vec3(1.0f, 1.0f, 0.0f));
+    vec = trans * vec;
+    XLOGE("glmFuncTest test translate: %f, %f, %f", vec.x, vec.y, vec.z);
+
+
+
+}
 bool XShader::Init(std::string &vertexCode, std::string &fragmentCode, TextureInfo (&texInfos)[]) {
     Close();
     std::lock_guard<std::mutex> lockGuard(g_mutex);
-
+    glmFuncTest();
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
     float vertices[] = {
@@ -96,7 +110,8 @@ bool XShader::Init(std::string &vertexCode, std::string &fragmentCode, TextureIn
     glGenTextures(1, &texture2);
     glBindTexture(GL_TEXTURE_2D, texture2);
     // set the texture wrapping parameters
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);  // set texture wrapping to GL_REPEAT (default wrapping method)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,
+                    GL_REPEAT);  // set texture wrapping to GL_REPEAT (default wrapping method)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     // set texture filtering parameters
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_MIRRORED_REPEAT);
