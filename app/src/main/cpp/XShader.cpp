@@ -168,6 +168,10 @@ bool XShader::Init(std::string &vertexCode, std::string &fragmentCode, TextureIn
     shader->setInt("texture1", 0);
     shader->setInt("texture2", 1);
 
+    // configure global opengl state
+    // -----------------------------
+    glEnable(GL_DEPTH_TEST);
+
     return true;
 }
 
@@ -188,7 +192,7 @@ void XShader::Draw() {
     if (shader == nullptr)
         return;
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT |  GL_DEPTH_BUFFER_BIT);
 
     shader->use();
     shader->setFloat("xOffset", xyOffSet.x);
