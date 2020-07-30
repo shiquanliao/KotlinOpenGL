@@ -34,7 +34,6 @@ public:
 private:
     unsigned int VAO = 0;
     unsigned int VBO = 0;
-    unsigned int EBO = 0;
     unsigned int texture1 = 0;
     unsigned int texture2 = 0;
     XYOffSet xyOffSet{0.0f, 0.0f};
