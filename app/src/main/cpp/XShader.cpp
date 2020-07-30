@@ -27,10 +27,9 @@ static void glmFuncTest() {
     trans = glm::translate(trans, glm::vec3(1.0f, 1.0f, 0.0f));
     vec = trans * vec;
     XLOGE("glmFuncTest test translate: %f, %f, %f", vec.x, vec.y, vec.z);
-
-
-
 }
+
+
 bool XShader::Init(std::string &vertexCode, std::string &fragmentCode, TextureInfo (&texInfos)[]) {
     Close();
     std::lock_guard<std::mutex> lockGuard(g_mutex);
@@ -39,10 +38,10 @@ bool XShader::Init(std::string &vertexCode, std::string &fragmentCode, TextureIn
     // ------------------------------------------------------------------
     float vertices[] = {
             // positions          // colors           // texture coords
-            0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 4.0f, 4.0f,   // top right
-            0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 4.0f, 0.0f,   // bottom right
+            0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f,   // top right
+            0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,   // bottom right
             -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,   // bottom left
-            -0.5f, 0.5f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 4.0f    // top left
+            -0.5f, 0.5f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f    // top left
     };
 
     unsigned int indices[] = {  // note that we start from 0!
@@ -131,6 +130,16 @@ bool XShader::Init(std::string &vertexCode, std::string &fragmentCode, TextureIn
     glUniform1i(glGetUniformLocation(shader->getId(), "texture1"), 0);
     // or set it via the texture class
     shader->setInt("texture2", 1);
+
+    // set mat4
+//    glm::mat4 trans = glm::mat4(1.0f);
+//    trans = glm::rotate(trans, glm::radians(90.0f), glm::vec3(0.0, 0.0, 1.0));
+//    trans = glm::scale(trans, glm::vec3(0.5, 0.5, 0.5));
+    glm::mat4 trans = glm::mat4(1.0f);
+    trans = glm::rotate(trans, glm::radians(90.0f), glm::vec3(0.0, 0.0, 1.0));
+    trans = glm::scale(trans, glm::vec3(0.5, 0.5, 0.5));
+    GLint transformId = glGetUniformLocation(shader->getId(), "transform");
+    glUniformMatrix4fv(transformId, 1, GL_FALSE, glm::value_ptr(trans));
 
     return true;
 }
