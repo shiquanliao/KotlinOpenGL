@@ -131,13 +131,12 @@ bool XShader::Init(std::string &vertexCode, std::string &fragmentCode, TextureIn
     // or set it via the texture class
     shader->setInt("texture2", 1);
 
-    // set mat4
-//    glm::mat4 trans = glm::mat4(1.0f);
+    // set uniform mat4 transform
+    glm::mat4 trans = glm::mat4(1.0f);
 //    trans = glm::rotate(trans, glm::radians(90.0f), glm::vec3(0.0, 0.0, 1.0));
 //    trans = glm::scale(trans, glm::vec3(0.5, 0.5, 0.5));
-    glm::mat4 trans = glm::mat4(1.0f);
-    trans = glm::rotate(trans, glm::radians(90.0f), glm::vec3(0.0, 0.0, 1.0));
-    trans = glm::scale(trans, glm::vec3(0.5, 0.5, 0.5));
+    trans = glm::translate(trans, glm::vec3(0.5, -0.5, 0.0));
+    trans = glm::rotate(trans, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 1.0f));
     GLint transformId = glGetUniformLocation(shader->getId(), "transform");
     glUniformMatrix4fv(transformId, 1, GL_FALSE, glm::value_ptr(trans));
 
