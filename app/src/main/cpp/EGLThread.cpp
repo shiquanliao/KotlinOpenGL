@@ -8,11 +8,13 @@
 #include <unistd.h>
 
 
+int EGLThread::surfaceWidth = 0;
+int EGLThread::surfaceHeight = 0;
 extern void *eglThreadImpl(void *context);
 
 EGLThread::EGLThread() : mEglThread(-1), pthread_mutex{}, pthread_cond{}, m_ANativeWindow(nullptr),
                          isCreate(false), isChange(false), isExit(false), isStart(false),
-                         surfaceWidth(0), surfaceHeight(0), renderType(RENDER_MODULE_MANUAL) {
+                         renderType(RENDER_MODULE_MANUAL) {
     pthread_mutex_init(&pthread_mutex, nullptr);
     pthread_cond_init(&pthread_cond, nullptr);
 }
@@ -125,6 +127,14 @@ void EGLThread::setIsExit(bool exit) {
 void EGLThread::moveXY(float x, float y) {
     xyOffSet.x = x;
     xyOffSet.y = y;
+}
+
+int EGLThread::getSurfaceWidth() {
+    return surfaceWidth;
+}
+
+int EGLThread::getSurfaceHeight() {
+    return surfaceHeight;
 }
 
 

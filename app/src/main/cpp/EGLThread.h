@@ -44,6 +44,12 @@ public:
 
     void moveXY(float x, float y);
 
+    void setIsExit(bool exit);
+
+    static int getSurfaceWidth();
+
+    static int getSurfaceHeight();
+
     EGLThread();
 
     ~EGLThread();
@@ -60,14 +66,11 @@ private:
     bool isCreate;
     bool isChange;
     bool isExit;
-public:
-    void setIsExit(bool exit);
-
-private:
     bool isStart;
     int renderType;
-    int surfaceWidth = 0;
-    int surfaceHeight = 0;
+    static int surfaceWidth;
+    static int surfaceHeight;
+
     XYOffSet xyOffSet{0.0f, 0.0f};
 
     OnCreate onCreate{};

@@ -5,6 +5,7 @@
 #include "XShader.h"
 #include "XLog.h"
 #include "shader_s.h"
+#include "EGLThread.h"
 #include <GLES3/gl3.h>
 #include <ctime>
 #include <glm/glm.hpp>
@@ -129,15 +130,6 @@ bool XShader::Init(std::string &vertexCode, std::string &fragmentCode, TextureIn
     shader->setInt("texture1", 0);
     shader->setInt("texture2", 1);
 
-    // set uniform mat4 transform
-    glm::mat4 trans = glm::mat4(1.0f);
-//    trans = glm::rotate(trans, glm::radians(90.0f), glm::vec3(0.0, 0.0, 1.0));
-//    trans = glm::scale(trans, glm::vec3(0.5, 0.5, 0.5));
-    trans = glm::translate(trans, glm::vec3(0.5, -0.5, 0.0));
-    trans = glm::rotate(trans, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 1.0f));
-    GLint transformId = glGetUniformLocation(shader->getId(), "transform");
-    glUniformMatrix4fv(transformId, 1, GL_FALSE, glm::value_ptr(trans));
-
     return true;
 }
 
@@ -165,6 +157,25 @@ void XShader::Draw() {
     shader->use();
     shader->setFloat("xOffset", xyOffSet.x);
     shader->setFloat("yOffset", xyOffSet.y);
+
+    // create transformations
+    glm::mat4 model = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
+    glm::mat4 view = glm::mat4(1.0f);
+    glm::mat4 projection = glm::mat4(1.0f);
+    model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+    view = glm::translate(view, glm::vec3(0.0, 0.0, -3.0));
+    projection = glm::perspective(glm::radians(45.0f),
+                                  (float) EGLThread::getSurfaceWidth() /
+                                  (float) EGLThread::getSurfaceHeight(),
+                                  0.1f, 100.0f);
+    // retrieve the matrix uniform locations
+    unsigned int modelLoc = glGetUniformLocation(shader->getId(), "model");
+    unsigned int viewLoc  = glGetUniformLocation(shader->getId(), "view");
+    // pass them to the shaders (3 different ways)
+    glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+    glUniformMatrix4fv(viewLoc, 1, GL_FALSE, &view[0][0]);
+    // note: currently we set the projection matrix each frame, but since the projection matrix rarely changes it's often best practice to set it outside the main loop only once.
+    shader->setMat4("projection", projection);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture1);
     glActiveTexture(GL_TEXTURE1);
