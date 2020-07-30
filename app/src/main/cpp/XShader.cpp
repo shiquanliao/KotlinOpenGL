@@ -126,9 +126,7 @@ bool XShader::Init(std::string &vertexCode, std::string &fragmentCode, TextureIn
     // tell opengl for each sampler to which texture unit it belongs to (only has to be done once)
     // -------------------------------------------------------------------------------------------
     shader->use(); // don't forget to activate/use the shader before setting uniforms!
-    // either set it manually like so:
-    glUniform1i(glGetUniformLocation(shader->getId(), "texture1"), 0);
-    // or set it via the texture class
+    shader->setInt("texture1", 0);
     shader->setInt("texture2", 1);
 
     // set uniform mat4 transform
