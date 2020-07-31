@@ -64,6 +64,7 @@ public:
                 EGL_GREEN_SIZE, 8,
                 EGL_BLUE_SIZE, 8,
                 EGL_SURFACE_TYPE, EGL_WINDOW_BIT,
+                EGL_DEPTH_SIZE, 24, //请求深度缓冲区
                 EGL_NONE
         };
         EGLint config = 0;
