@@ -39,6 +39,8 @@ private:
     XYOffSet xyOffSet{0.0f, 0.0f};
     Shader *shader = nullptr;
     std::mutex g_mutex;
+    // world space positions of our cubes
+    glm::vec3 *cubePositions = nullptr;
 };
 
 
