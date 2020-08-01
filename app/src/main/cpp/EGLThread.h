@@ -57,6 +57,10 @@ public:
 private:
 
     pthread_t mEglThread = -1;
+public:
+    pthread_t getMEglThread() const;
+
+private:
     pthread_mutex_t pthread_mutex;
     pthread_cond_t pthread_cond;
     ANativeWindow *m_ANativeWindow;

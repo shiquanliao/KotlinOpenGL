@@ -181,6 +181,12 @@ bool XShader::Init(std::string &vertexCode, std::string &fragmentCode, TextureIn
     shader->setInt("texture1", 0);
     shader->setInt("texture2", 1);
 
+    glm::mat4 projection = glm::perspective(glm::radians(45.0f),
+                                            (float) EGLThread::getSurfaceWidth() /
+                                            (float) EGLThread::getSurfaceHeight(),
+                                            0.1f, 100.0f);
+    shader->setMat4("projection", projection);
+
     // configure global opengl state
     // -----------------------------
     glEnable(GL_DEPTH_TEST);
@@ -198,7 +204,7 @@ void XShader::Close() {
         delete shader;
         shader = nullptr;
     }
-    if(cubePositions != nullptr){
+    if (cubePositions != nullptr) {
         delete[] cubePositions;
         cubePositions = nullptr;
     }
@@ -215,22 +221,17 @@ void XShader::Draw() {
     shader->setFloat("xOffset", xyOffSet.x);
     shader->setFloat("yOffset", xyOffSet.y);
 
-
-//    XLOGE("getTime(): %lf", getTime());
-    // create transformations
+    // create/view transformation
     glm::mat4 view = glm::mat4(1.0f);
-    glm::mat4 projection = glm::mat4(1.0f);
-    view = glm::translate(view, glm::vec3(0.0, 0.0, -3.0));
-    projection = glm::perspective(glm::radians(45.0f),
-                                  (float) EGLThread::getSurfaceWidth() /
-                                  (float) EGLThread::getSurfaceHeight(),
-                                  0.1f, 100.0f);
-    // retrieve the matrix uniform locations
-    unsigned int viewLoc = glGetUniformLocation(shader->getId(), "view");
-    // pass them to the shaders (3 different ways)
-    glUniformMatrix4fv(viewLoc, 1, GL_FALSE, &view[0][0]);
-    // note: currently we set the projection matrix each frame, but since the projection matrix rarely changes it's often best practice to set it outside the main loop only once.
-    shader->setMat4("projection", projection);
+    float radius = 10.0f;
+    float camX = sin(getTime()) * radius;
+    float camZ = cos(getTime()) * radius;
+//    float camX = 0.0f;
+//    float camZ = 3.0f;
+    view = glm::lookAt(glm::vec3(camX, 0.0f, camZ), glm::vec3(0.0f, 0.0f, 0.0f),
+                       glm::vec3(0.0f, 1.0f, 0.0f));
+    shader->setMat4("view", view);
+
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture1);
     glActiveTexture(GL_TEXTURE1);
@@ -241,9 +242,9 @@ void XShader::Draw() {
         // calculate the model matrix for each object and pass it to shader before drawing
         glm::mat4 model = glm::mat4(1.0f);
         model = glm::translate(model, cubePositions[i]);
-        float angle = 20.0f * (float)i;
-        if( i % 3 == 0){
-            angle = (float)getTime() * 25.0f;
+        float angle = 20.0f * (float) i;
+        if (i % 3 == 0) {
+            angle = (float) getTime() * 25.0f;
         }
         model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
         shader->setMat4("model", model);

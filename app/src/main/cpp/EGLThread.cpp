@@ -137,4 +137,8 @@ int EGLThread::getSurfaceHeight() {
     return surfaceHeight;
 }
 
+pthread_t EGLThread::getMEglThread() const {
+    return mEglThread;
+}
+
 

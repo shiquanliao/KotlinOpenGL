@@ -19,8 +19,8 @@
 EGLThread *eglThread = nullptr;
 std::string vertexShaderCode;
 std::string fragmentShaderCode;
-TextureInfo tex1{};
-TextureInfo tex2{};
+TextureInfo tex1{nullptr, 0, 0, 0};
+TextureInfo tex2{nullptr, 0, 0, 0};
 TextureInfo textureInfos[] = {tex1, tex2};
 
 void callBackOnCreate() {
@@ -81,7 +81,9 @@ Java_com_example_kotlinopengl_JNIUtils_nativeSurfaceDestroyed(JNIEnv *env, jobje
     if (eglThread) {
         eglThread->setIsExit(true);
         //等待线程结束
-        pthread_join(reinterpret_cast<pthread_t>(eglThread), nullptr);
+        textureInfos[0].buffer = nullptr;
+        textureInfos[1].buffer = nullptr;
+        pthread_join(eglThread->getMEglThread(), nullptr);
         delete (eglThread);
         eglThread = nullptr;
     }
